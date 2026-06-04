@@ -53,7 +53,7 @@ _LABEL_TASK       = (166, 227, 161, 255)
 _LABEL_POSE       = (250, 179, 135, 255)
 
 # Heat-map cell colors for the `signal_map` camera. Bucketed by the value
-# of `horizontal_accuracy` in meters (lower = better RTK quality).
+# of `WIFI horizontal_accuracy` in meters (lower = better RTK quality).
 # Semi-transparent so zone outlines / channel lines remain readable on top.
 #
 # 10-step gradient from green (best) → yellow (mid) → red (worst), at 0.02m
@@ -458,7 +458,7 @@ def render_map(
 
 
 def _heat_color_ha(value: float) -> tuple[int, int, int, int]:
-    """Bucket-lookup RGBA fill for a horizontal_accuracy heat cell.
+    """Bucket-lookup RGBA fill for a WIFI horizontal_accuracy heat cell.
 
     Steps are ``_HEAT_GRADIENT_BUCKET_M`` wide starting at 0. Values at or
     above ``_HEAT_GRADIENT_MAX_M`` saturate to the last (red) step.
@@ -479,7 +479,7 @@ def _heat_color_ha(value: float) -> tuple[int, int, int, int]:
 def _draw_heat_legend(
     img: Image.Image,
     *,
-    title: str = "Horizontal accuracy (m)",
+    title: str = "WIFI Horizontal accuracy (m)",
 ) -> None:
     """Stamp a horizontal-accuracy color-bar legend onto the rendered image.
 
