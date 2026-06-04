@@ -53,7 +53,7 @@ _LABEL_TASK       = (166, 227, 161, 255)
 _LABEL_POSE       = (250, 179, 135, 255)
 
 # Heat-map cell colors for the `signal_map` camera. Bucketed by the value
-# of `WIFI horizontal_accuracy` in meters (lower = better RTK quality).
+# of `wifi_signal` in meters (lower = better RTK quality).
 # Semi-transparent so zone outlines / channel lines remain readable on top.
 #
 # 10-step gradient from green (best) → yellow (mid) → red (worst), at 0.02m
@@ -271,7 +271,7 @@ def render_map(
 
     1. Faint reference grid every 5m.
     2. Signal-quality heat cells (only when ``signal_grid`` is provided)
-       — each cell with a recorded ``horizontal_accuracy`` value gets a
+       — each cell with a recorded ``wifi_signal`` value gets a
        semi-transparent colored rectangle. See ``_heat_color_ha`` for the
        palette, ``_draw_heat_legend`` for the bottom-left legend.
     3. Channel fills (faint).
@@ -342,7 +342,7 @@ def render_map(
     # 2) Heat cells (only when a grid was provided and has HA samples).
     if signal_grid is not None and cell_m is not None:
         for (cx, cy), cell in signal_grid.cells().items():
-            ha = cell.horizontal_accuracy
+            ha = cell.wifi_signal
             if ha is None:
                 continue
             color = _heat_color_ha(ha)
@@ -458,13 +458,13 @@ def render_map(
 
 
 def _heat_color_ha(value: float) -> tuple[int, int, int, int]:
-    """Bucket-lookup RGBA fill for a WIFI horizontal_accuracy heat cell.
+    """Bucket-lookup RGBA fill for a wifi_signal heat cell.
 
     Steps are ``_HEAT_GRADIENT_BUCKET_M`` wide starting at 0. Values at or
     above ``_HEAT_GRADIENT_MAX_M`` saturate to the last (red) step.
     """
     # Negative or nonsense values get clamped to the best bucket (defensive
-    # — should not happen with PbLocalizationInfo.horizontalAccuracy, which
+    # — should not happen with PbLocalizationInfo.wifi_signal, which
     # is always non-negative).
     if value <= 0.0:
         return _HEAT_PALETTE_HA[0]
@@ -479,9 +479,9 @@ def _heat_color_ha(value: float) -> tuple[int, int, int, int]:
 def _draw_heat_legend(
     img: Image.Image,
     *,
-    title: str = "WIFI Horizontal accuracy (m)",
+    title: str = "wifi_signal (m)",
 ) -> None:
-    """Stamp a horizontal-accuracy color-bar legend onto the rendered image.
+    """Stamp a wifi_signal color-bar legend onto the rendered image.
 
     Draws a small legend block in the bottom-left corner: title text on top,
     a 10-cell color strip, tick labels at 0, midpoint, max. The block sits
