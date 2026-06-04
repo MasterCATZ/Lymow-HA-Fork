@@ -696,6 +696,32 @@ SENSORS: tuple[LymowSensorDesc, ...] = (
         value_source=lambda d: (d.get("path_data") or {}).get("path_length_m"),
         entity_registry_enabled_default=False,
     ),
+    LymowSensorDesc(
+        key="Zones",
+        name="Zones Last Mowed",
+        icon="mdi:fan",
+        value_source="Zones",
+        entity_category=EntityCategory.ZONES,
+        entity_registry_enabled_default=True,
+
+        def _last_mow_zones(s):
+    cr = s.get("last_clean_report")
+    if not cr:
+        return None
+    zone_ids = list(cr.cleanInfo.areaInfo.cleanZoneIds)
+    if not zone_ids:
+        return None
+    catalog = s.get("zone_catalog")
+    if not catalog:
+        return ", ".join(zone_ids)
+    names = [
+        catalog.zones_by_hashid[h].name
+        if h in catalog.zones_by_hashid
+        else h
+        for h in zone_ids
+    ]
+    return ", ".join(names)
+    ),
 
 )
 
